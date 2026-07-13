@@ -17,3 +17,7 @@ spring:
   flyway:
     locations: classpath:sql
     enabled: true
+
+jwt:
+  secret: Zm9vYmFyYmF6cXV4ZXhhbXBsZXNlY3JldGZvcmp3dHNpZ25pbmc=
+  expiration: 86400000
