@@ -43,7 +43,7 @@ private SecretKey getSigningKey(){
 
 }
 private boolean isExpired(String token){
-        return extractDetails(token).getExpiration().before(new Date(expiration));
+        return extractDetails(token).getExpiration().before(new Date());
 
 }
 public String extractUsername(String token){

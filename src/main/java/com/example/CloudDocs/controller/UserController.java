@@ -24,7 +24,7 @@ private final JwtService jwtService;
     @PostMapping
     public ResponseEntity<AuthResponse> userLogin(@RequestBody LoginRequest loginRequest){
         Authentication auth=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
+                loginRequest.getEmail(),
                 loginRequest.getPassword()
         ));
         UserDetails user=(UserDetails)auth.getPrincipal();
