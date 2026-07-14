@@ -29,7 +29,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) {
         http.csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/public/**", "/auth/**", "/login/**").permitAll()
+                        auth.requestMatchers("/public/**", "/auth/**", "/login/**","/actuator/**").permitAll()
                                 .requestMatchers("/admin/**").hasRole("ADMIN").anyRequest().authenticated()
                 ).sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
