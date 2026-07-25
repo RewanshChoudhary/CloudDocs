@@ -21,3 +21,8 @@ spring:
 jwt:
   secret: Zm9vYmFyYmF6cXV4ZXhhbXBsZXNlY3JldGZvcmp3dHNpZ25pbmc=
   expiration: 86400000
+  refresh-expiration: 604800000
+cloudinary:
+  cloud_name: dq220j08p
+  api_key: 173816746428851
+  api_secret: MywkFenL-1s3pCOBkbqK8qxSQdI

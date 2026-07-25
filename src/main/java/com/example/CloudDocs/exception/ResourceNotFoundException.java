@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ResourceNotFoundException extends Exception{
-   public  ResourceNotFoundException(String message) {
+   public ResourceNotFoundException(String message) {
         super(message);
 
     }
