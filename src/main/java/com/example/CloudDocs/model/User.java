@@ -42,6 +42,7 @@ public class User implements UserDetails {
     @Column(nullable = false, length = 255)
     private String password;
 
+    @Builder.Default
     @Column(nullable = false, length = 20)
     private String role = "ROLE_USER";
 

@@ -9,6 +9,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +22,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class FileMetadata {
 
     @Id
@@ -41,6 +45,7 @@ public class FileMetadata {
     @Column(nullable = false)
     private Long fileSize;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer downloadCount = 0;
 
@@ -53,6 +58,8 @@ public class FileMetadata {
 
     @PrePersist
     protected void onCreate() {
-        this.uploadedAt = LocalDateTime.now();
+        if (this.uploadedAt == null) {
+            this.uploadedAt = LocalDateTime.now();
+        }
     }
 }

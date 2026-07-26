@@ -15,21 +15,26 @@ public class CloudinaryService {
     private final Cloudinary cloudinary;
 
 
-    public Map<String,Object> uploadFile(MultipartFile file,String descripttion) throws IOException {
-        Map uploadRes=cloudinary.uploader().upload(
+    public Map<String, Object> uploadFile(MultipartFile file, String description) throws IOException {
+        Map uploadRes = cloudinary.uploader().upload(
                 file.getBytes(),
-                ObjectUtils.asMap("folder","clouddocs/","description",descripttion)
-
+                ObjectUtils.asMap(
+                        "folder", "clouddocs/",
+                        "resource_type", "auto",
+                        "description", description != null ? description : ""
+                )
         );
+        String url = uploadRes.get("secure_url") != null ? uploadRes.get("secure_url").toString() : "";
+        String publicId = uploadRes.get("public_id") != null ? uploadRes.get("public_id").toString() : "";
         return Map.of(
-                "url",uploadRes.get("secure_url"),"publicId",uploadRes.get("public_id")
+                "url", url,
+                "publicId", publicId
         );
-
-
     }
+
     public void deleteFile(String publicId) throws IOException {
-        cloudinary.uploader().destroy(publicId,ObjectUtils.emptyMap());
-        System.out.println("File deleted successfully");
-        
+        if (publicId != null && !publicId.isBlank()) {
+            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+        }
     }
 }
