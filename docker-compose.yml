@@ -11,5 +11,35 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  localstack:
+    image: localstack/localstack:3
+    container_name: clouddocs-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: s3,sqs
+      AWS_DEFAULT_REGION: us-east-1
+      DEBUG: "0"
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  worker:
+    build:
+      context: ./worker
+    container_name: clouddocs-worker
+    depends_on:
+      - postgres
+      - localstack
+    environment:
+      AWS_REGION: us-east-1
+      AWS_ENDPOINT_URL: http://localstack:4566
+      MEDIA_S3_BUCKET: clouddocs-media-dev
+      MEDIA_SQS_QUEUE_URL: http://localstack:4566/000000000000/clouddocs-media-events
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/clouddocs
+      RAW_PREFIX: raw
+      PROCESSED_PREFIX: processed
+
 volumes:
   postgres_data:
+  localstack_data:

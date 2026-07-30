@@ -18,6 +18,16 @@ spring:
     locations: classpath:sql
     enabled: true
 
+media:
+  aws:
+    region: ${AWS_REGION:us-east-1}
+    bucket-name: ${MEDIA_S3_BUCKET:}
+    raw-prefix: ${MEDIA_RAW_PREFIX:raw}
+    processed-prefix: ${MEDIA_PROCESSED_PREFIX:processed}
+    queue-url: ${MEDIA_SQS_QUEUE_URL:}
+    upload-url-ttl: ${MEDIA_UPLOAD_URL_TTL:15m}
+    download-url-ttl: ${MEDIA_DOWNLOAD_URL_TTL:15m}
+
 jwt:
   secret: Zm9vYmFyYmF6cXV4ZXhhbXBsZXNlY3JldGZvcmp3dHNpZ25pbmc=
   expiration: 86400000
