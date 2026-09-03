@@ -32,11 +32,10 @@ cloudinary:
   cloud_name: dq220j08p
   api_key: 173816746428851
   api_secret: MywkFenL-1s3pCOBkbqK8qxSQdI
-  profiles:
-      active: awss3
-    cloud:
-      config:
-        server:
-          awss3:
-            region: us-east-1
-            bucket: bucket1
+aws:
+  region: us-east-1
+  s3:
+    bucket-name: CloudDocs-bucket
+  credentials:
+    access-key: ${AWS_ACCESS_KEY_ID}
+    secret-key: ${AWS_SECRET_ACCESS_KEY}
