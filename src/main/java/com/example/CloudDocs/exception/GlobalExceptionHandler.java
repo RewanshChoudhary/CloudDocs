@@ -1,6 +1,7 @@
 package com.example.CloudDocs.exception;
 
 import com.example.CloudDocs.dto.ErrorResponseDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateEmailException.class)
@@ -52,6 +54,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleGenericException(Exception e) {
+        log.error("Unhandled exception", e);
         ErrorResponseDto error = ErrorResponseDto.builder()
                 .message("Internal server error: " + e.getMessage())
                 .timestamp(Instant.now())

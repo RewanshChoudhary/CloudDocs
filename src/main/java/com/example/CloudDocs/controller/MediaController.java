@@ -13,6 +13,7 @@ import com.example.CloudDocs.repository.SharedLinkRepository;
 import com.example.CloudDocs.repository.UserRepository;
 import com.example.CloudDocs.service.CloudinaryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -35,6 +36,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/api/media")
 public class MediaController {
 
@@ -104,6 +106,7 @@ public class MediaController {
                 .orElseThrow(() -> new ResourceNotFoundException("File not found with id: " + id));
 
         if (!file.getUploadedBy().getId().equals(user.getId()) && !"ROLE_ADMIN".equals(user.getRole())) {
+            log.warn("Forbidden delete attempt: user={} on file={}", user.getEmail(), id);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error("You are not authorized to delete this file"));
         }
 
@@ -147,6 +150,7 @@ public class MediaController {
                 .orElseThrow(() -> new ResourceNotFoundException("Shared link invalid or expired"));
 
         if (!Boolean.TRUE.equals(link.getIsActive()) || link.getExpiresAt().isBefore(LocalDateTime.now())) {
+            log.warn("Expired or inactive shared link accessed: token={}", token);
             return ResponseEntity.status(HttpStatus.GONE).body(ApiResponse.error("Shared link has expired"));
         }
 

@@ -7,6 +7,7 @@ import com.example.CloudDocs.exception.DuplicateEmailException;
 import com.example.CloudDocs.model.User;
 import com.example.CloudDocs.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -23,9 +25,11 @@ public class AuthService {
 
     public AuthResponseDto register(RegisterRequestDto request) {
         if (userRepository.existsByEmail(request.getEmail())) {
+            log.warn("Registration rejected: duplicate email {}", request.getEmail());
             throw new DuplicateEmailException("Email already exists: " + request.getEmail());
         }
         if (userRepository.existsByUsername(request.getUsername())) {
+            log.warn("Registration rejected: duplicate username {}", request.getUsername());
             throw new DuplicateEmailException("Username already exists: " + request.getUsername());
         }
 
@@ -41,6 +45,8 @@ public class AuthService {
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
+        log.info("User registered successfully: {}", user.getEmail());
+
         return AuthResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -50,15 +56,22 @@ public class AuthService {
     }
 
     public AuthResponseDto login(LoginRequestDto request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+        } catch (Exception e) {
+            log.warn("Login failed for {}: {}", request.getEmail(), e.getMessage());
+            throw e;
+        }
 
         UserDetails user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
+
+        log.info("User logged in: {}", request.getEmail());
 
         return AuthResponseDto.builder()
                 .accessToken(accessToken)
