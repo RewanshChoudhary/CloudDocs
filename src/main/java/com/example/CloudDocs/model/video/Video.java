@@ -16,13 +16,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "videos")
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Video {
 
     @Id
@@ -52,14 +56,14 @@ public class Video {
     @Column(length = 1000)
     private String errorMessage;
 
-    @Column(length = 512)
-    private String s3720pKey;
+    @Column(name = "s3_720p_key", length = 512)
+    private String s3Key720p;
 
-    @Column(length = 512)
-    private String s3480pKey;
+    @Column(name = "s3_480p_key", length = 512)
+    private String s3Key480p;
 
-    @Column(length = 512)
-    private String s3360pKey;
+    @Column(name = "s3_360p_key", length = 512)
+    private String s3Key360p;
 
     @Column(length = 512)
     private String s3ThumbnailKey;

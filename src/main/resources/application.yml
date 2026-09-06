@@ -3,13 +3,13 @@ spring:
     name: CloudDocs
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/clouddocs
-    username: postgres
-    password: postgres
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/clouddocs}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -25,17 +25,18 @@ media:
     queue-url: ${MEDIA_SQS_QUEUE_URL:}
 
 jwt:
-  secret: Zm9vYmFyYmF6cXV4ZXhhbXBsZXNlY3JldGZvcmp3dHNpZ25pbmc=
-  expiration: 86400000
-  refresh-expiration: 604800000
+  secret: ${JWT_SECRET:Zm9vYmFyYmF6cXV4ZXhhbXBsZXNlY3JldGZvcmp3dHNpZ25pbmc=}
+  expiration: ${JWT_EXPIRATION:86400000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
 cloudinary:
-  cloud_name: dq220j08p
-  api_key: 173816746428851
-  api_secret: MywkFenL-1s3pCOBkbqK8qxSQdI
+  cloud_name: ${CLOUDINARY_CLOUD_NAME:}
+  api_key: ${CLOUDINARY_API_KEY:}
+  api_secret: ${CLOUDINARY_API_SECRET:}
 aws:
-  region: us-east-1
+  region: ${AWS_REGION:us-east-1}
   s3:
-    bucket-name: CloudDocs-bucket
+    bucket-name: ${MEDIA_S3_BUCKET:clouddocs-media-local}
+    endpoint: ${AWS_S3_ENDPOINT:}
   credentials:
-    access-key: ${AWS_ACCESS_KEY_ID}
-    secret-key: ${AWS_SECRET_ACCESS_KEY}
+    access-key: ${AWS_ACCESS_KEY_ID:}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:}

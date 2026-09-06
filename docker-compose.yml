@@ -1,9 +1,68 @@
 services:
-  web-app:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: clouddocs
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d clouddocs"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  localstack:
+    image: localstack/localstack:3.7
+    environment:
+      SERVICES: s3,sqs
+      AWS_DEFAULT_REGION: us-east-1
+      MEDIA_S3_BUCKET: clouddocs-media-local
+      MEDIA_SQS_QUEUE_NAME: clouddocs-media-events
+      MEDIA_SQS_DLQ_NAME: clouddocs-media-events-dlq
+    ports:
+      - "4566:4566"
+    volumes:
+      - ./infra/localstack:/etc/localstack/init/ready.d
+    healthcheck:
+      test: ["CMD", "awslocal", "sqs", "list-queues"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/clouddocs
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_S3_ENDPOINT: http://localstack:4566
+      MEDIA_S3_BUCKET: clouddocs-media-local
+      MEDIA_SQS_QUEUE_URL: http://localstack:4566/000000000000/clouddocs-media-events
+    ports:
+      - "8080:8080"
+
+  worker:
     build: ./worker
     depends_on:
-      - redis-server
-  redis-server: # <--- This is your service name
-    image: redis:latest
-    ports:
-      - "6379:6379"
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+    environment:
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_ENDPOINT_URL: http://localstack:4566
+      MEDIA_S3_BUCKET: clouddocs-media-local
+      MEDIA_SQS_QUEUE_URL: http://localstack:4566/000000000000/clouddocs-media-events
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/clouddocs

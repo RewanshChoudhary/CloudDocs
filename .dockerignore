@@ -1,0 +1,5 @@
+.git
+target
+worker/venv
+worker/.venv
+worker/__pycache__

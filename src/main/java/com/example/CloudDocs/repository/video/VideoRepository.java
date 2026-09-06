@@ -5,8 +5,10 @@ import com.example.CloudDocs.model.video.Video;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface VideoRepository extends JpaRepository<Video, UUID> {
     List<Video> findByUserOrderByCreatedAtDesc(User user);
+    Optional<Video> findByIdAndUser(UUID id, User user);
 }

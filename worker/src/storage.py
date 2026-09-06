@@ -1,26 +1,56 @@
-import cloudinary
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-CLOUD_API_SECRET=os.getenv("CLOUD_API_SECRET")
-CLOUD_NAME=os.getenv("CLOUD_NAME")
-CLOUD_API_KEY=os.getenv("CLOUD_API_KEY")
-cloudinary.config(
-    cloud_name=CLOUD_NAME,
-    api_key=CLOUD_API_KEY,
-    api_secret=CLOUD_API_SECRET
-   
-)
-
-def download_raw_video(bucket: str, raw_key: str, destination_path: str) -> None:
-
-    return None
+from pathlib import Path
 
 
-def upload_processed_file(bucket: str, local_path: str, output_key: str, content_type: str) -> None:
-    return None
+import boto3
 
 
-def upload_all_outputs(bucket: str, video_id: str, output_paths: dict[str, str]) -> dict[str, str]:
-    return {}
+from .settings import Settings
+
+
+def s3_client(settings: Settings):
+    return boto3.client(
+        "s3",
+        region_name=settings.aws_region,
+        endpoint_url=settings.aws_endpoint_url,
+    )
+
+
+def download_raw_video(settings: Settings, bucket: str, raw_key: str, destination_path: Path) -> None:
+    destination_path.parent.mkdir(parents=True, exist_ok=True)
+    s3_client(settings).download_file(bucket, raw_key, str(destination_path))
+
+
+def upload_processed_file(
+    settings: Settings,
+    bucket: str,
+    local_path: Path,
+    output_key: str,
+    content_type: str,
+) -> None:
+    s3_client(settings).upload_file(
+        str(local_path),
+        bucket,
+        output_key,
+        ExtraArgs={"ContentType": content_type},
+    )
+
+
+def upload_all_outputs(
+    settings: Settings,
+    bucket: str,
+    video_id: str,
+    output_paths: dict[str, Path],
+) -> dict[str, str]:
+    uploaded_keys = {}
+    for rendition, local_path in output_paths.items():
+        if rendition == "thumbnail":
+            output_key = f"{settings.processed_prefix}/{video_id}/thumbnail.jpg"
+            content_type = "image/jpeg"
+        else:
+            output_key = f"{settings.processed_prefix}/{video_id}/{rendition}.mp4"
+            content_type = "video/mp4"
+
+        upload_processed_file(settings, bucket, local_path, output_key, content_type)
+        uploaded_keys[rendition] = output_key
+
+    return uploaded_keys

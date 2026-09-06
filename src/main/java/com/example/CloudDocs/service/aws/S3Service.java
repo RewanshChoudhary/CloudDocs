@@ -24,7 +24,7 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 @RequiredArgsConstructor
 @Slf4j
 public class S3Service{
-    @Value("${aws.bucket.name}")
+    @Value("${aws.s3.bucket-name}")
     private String bucketName;
 
     private final S3Client s3Client;
