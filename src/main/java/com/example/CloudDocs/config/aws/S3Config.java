@@ -13,8 +13,8 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
+import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner.Builder;
 
 
 
@@ -25,6 +25,9 @@ public class S3Config {
 
     @Value("${aws.s3.endpoint}")
     private String s3Endpoint;
+
+    @Value("${aws.s3.presign-endpoint:${aws.s3.endpoint}}")
+    private String s3PresignEndpoint;
 
     @Value("${aws.credentials.access-key:}")
     private String accessKey;
@@ -42,7 +45,7 @@ public class S3Config {
 
          if (!s3Endpoint.isBlank()) {
             builder.endpointOverride(URI.create(s3Endpoint))
-                   .forcePathStyle(true); // required for LocalStack
+                   .serviceConfiguration(pathStyleConfiguration());
         }
 
         return builder.build();
@@ -52,15 +55,22 @@ public class S3Config {
 
     @Bean
     public S3Presigner s3Presigner() {
-        Builder builder = S3Presigner.builder()
+        S3Presigner.Builder builder = S3Presigner.builder()
                 .credentialsProvider(credentialsProvider())
                 .region(Region.of(region));
 
-        if (!s3Endpoint.isBlank()) {
-            builder.endpointOverride(URI.create(s3Endpoint));
+        if (!s3PresignEndpoint.isBlank()) {
+            builder.endpointOverride(URI.create(s3PresignEndpoint))
+                    .serviceConfiguration(pathStyleConfiguration());
         }
 
         return builder.build();
+    }
+
+    private S3Configuration pathStyleConfiguration() {
+        return S3Configuration.builder()
+                .pathStyleAccessEnabled(true)
+                .build();
     }
 
     private AwsCredentialsProvider credentialsProvider() {

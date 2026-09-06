@@ -18,13 +18,14 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import com.example.CloudDocs.CloudDocsApplication;
 import com.example.CloudDocs.service.aws.S3Service;
 
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 
-@Testcontainers
-@SpringBootTest
+@Testcontainers(disabledWithoutDocker = true)
+@SpringBootTest(classes = CloudDocsApplication.class)
 class S3ServiceIntegrationTest {
 
     @Container

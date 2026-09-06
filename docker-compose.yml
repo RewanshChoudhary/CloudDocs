@@ -46,6 +46,7 @@ services:
       AWS_ACCESS_KEY_ID: test
       AWS_SECRET_ACCESS_KEY: test
       AWS_S3_ENDPOINT: http://localstack:4566
+      AWS_S3_PRESIGN_ENDPOINT: http://localhost:4566
       MEDIA_S3_BUCKET: clouddocs-media-local
       MEDIA_SQS_QUEUE_URL: http://localstack:4566/000000000000/clouddocs-media-events
     ports:

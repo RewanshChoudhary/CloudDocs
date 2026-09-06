@@ -2,6 +2,18 @@ spring:
   application:
     name: CloudDocs
 
+  cloud:
+    aws:
+      region:
+        static: ${AWS_REGION:us-east-1}
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID:}
+        secret-key: ${AWS_SECRET_ACCESS_KEY:}
+      s3:
+        endpoint: ${AWS_S3_ENDPOINT:}
+      sqs:
+        endpoint: ${AWS_ENDPOINT_URL:}
+
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/clouddocs}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
@@ -37,6 +49,7 @@ aws:
   s3:
     bucket-name: ${MEDIA_S3_BUCKET:clouddocs-media-local}
     endpoint: ${AWS_S3_ENDPOINT:}
+    presign-endpoint: ${AWS_S3_PRESIGN_ENDPOINT:${AWS_S3_ENDPOINT:}}
   credentials:
     access-key: ${AWS_ACCESS_KEY_ID:}
     secret-key: ${AWS_SECRET_ACCESS_KEY:}
