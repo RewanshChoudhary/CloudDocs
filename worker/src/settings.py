@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import os
 
 
 @dataclass(frozen=True)
@@ -17,14 +18,17 @@ class Settings:
 
 def load_settings() -> Settings:
     return Settings(
-        aws_region="",
-        aws_endpoint_url=None,
-        bucket_name="",
-        queue_url="",
-        database_url="",
-        raw_prefix="",
-        processed_prefix="",
-        workspace_dir="",
-        wait_time_seconds=0,
-        visibility_timeout=0,
+        aws_region=os.getenv("AWS_REGION", "us-east-1"),
+        aws_endpoint_url=os.getenv("AWS_ENDPOINT_URL") or None,
+        bucket_name=os.getenv("MEDIA_S3_BUCKET", "clouddocs-media-local"),
+        queue_url=os.getenv("MEDIA_SQS_QUEUE_URL", ""),
+        database_url=os.getenv(
+            "DATABASE_URL",
+            "postgresql://postgres:postgres@localhost:5432/clouddocs",
+        ),
+        raw_prefix=os.getenv("RAW_PREFIX", "raw"),
+        processed_prefix=os.getenv("PROCESSED_PREFIX", "processed"),
+        workspace_dir=os.getenv("WORKSPACE_DIR", "/tmp/clouddocs-worker"),
+        wait_time_seconds=int(os.getenv("SQS_WAIT_TIME_SECONDS", "20")),
+        visibility_timeout=int(os.getenv("SQS_VISIBILITY_TIMEOUT", "900")),
     )
